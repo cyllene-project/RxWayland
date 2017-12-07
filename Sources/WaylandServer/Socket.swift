@@ -8,7 +8,7 @@ private let UNIX_PATH_MAX = 108
 private let LOCK_SUFFIX = ".lock"
 private let LOCK_SUFFIXLEN = 5
 
-public class Socket {
+public struct Socket {
 
 	var fd: Int = 0
 	var fdLock: Int = 0

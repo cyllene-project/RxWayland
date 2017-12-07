@@ -7,10 +7,11 @@ struct Buffer {
 		
 		var head, size: UInt32
 		
-		if (count > self.data.length) {
+		//if (count > self.data.length) {
 			
 			
-		}
+		//}
+		return 1
 		
 	}
 

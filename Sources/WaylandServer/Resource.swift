@@ -2,7 +2,7 @@ typealias ResourceDestroyFunc = (Resource) -> Void
 
 struct Resource {
 
-	var object: Object
+	//var object: Object
 	
 	var destroy: ResourceDestroyFunc
 	

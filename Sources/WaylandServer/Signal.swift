@@ -1,4 +1,4 @@
-struct Signal {
+struct WSignal {
 
 	//var listenerList: LinkedList<>
 

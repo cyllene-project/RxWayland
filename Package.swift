@@ -13,13 +13,17 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/cyllene-project/Networking.git", from: "0.2.1"),
+        .package(url: "https://github.com/IBM-Swift/BlueSignals.git", from: "0.9.50"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "WaylandServer",
-            dependencies: ["Networking"]),
+            dependencies: ["Networking", "Util", "Signals"]),
+        .target(
+            name: "Util",
+            dependencies: []),
         .testTarget(
             name: "WaylandTests",
             dependencies: ["WaylandServer"]),

@@ -4,11 +4,11 @@ import Glibc
 import Darwin
 #endif
 
-func epollCreateCloexec() -> Int {
+func epollCreateCloexec() -> Int32 {
 
-	var fd: Int
+	var fd: Int32 = 0
 	
-	fd = epoll_create1(EPOLL_CLOEXEC)
+	//fd = epoll_create1(EPOLL_CLOEXEC)
 	
 	if fd >= 0 {
 		return fd
@@ -17,28 +17,28 @@ func epollCreateCloexec() -> Int {
 		return -1
 	}
 	
-	fd = epoll_create(1)
-	return setCloexecOrClose(fd)
+	//fd = epoll_create(1)
+	return setCloexecOrClose(fd:fd)
 }
 
 
-func setCloexecOrClose(fd:Int) -> Int {
+func setCloexecOrClose(fd:Int32) -> Int32 {
 	
 	if fd == -1 {
 		return -1
 	}
 	
-	let flags: Long = fcntl(fd, F_GETFD)
+	let flags: Int32 = fcntl(fd, F_GETFD)
 	
 	if flags == -1 {
 		close(fd)
 		return -1
 	}
 	
-	if fnctl(fd, F_SETFD, flags | FD_CLOEXEC) == -1 {
-		close(fd)
-		return -1
-	}
+	//if fnctl(fd, F_SETFD, flags | FD_CLOEXEC) == -1 {
+	//	close(fd)
+	//	return -1
+	//}
 	
 	return fd
 
