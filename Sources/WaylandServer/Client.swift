@@ -18,4 +18,15 @@ public class Client {
 	//var resourceCreatedSignal: PrivateSignal
 
 
+	init (display:Display, fd:Int32) {
+		
+		self.display = display
+		
+		//self.source = display.loop.addFd(fd:fd, type:.readable, cb: connectionData, data: self)
+		
+		
+		
+		
+	}
+
 }
