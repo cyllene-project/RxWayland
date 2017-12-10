@@ -1,42 +1,22 @@
 //===----------------------------------------------------------------------===//
-//
+// PrivateSignal.swift
+// 
 // This source file is part of the Cyllene open source project
-//
-// Copyright (c) 2017 Chris Daley
+// https://github.com/cyllene-project
+// 
+// Copyright (c) 2017 Chris Daley <chebizarro@gmail.com>
+// 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-//
+// 
 // See http://www.apache.org/licenses/LICENSE-2.0 for license information
-//
+
 //===----------------------------------------------------------------------===//
 
-public class EventQueue {
+public class PrivateSignal {
 	
-	var eventList = LinkedList<Closure>()
-	var display: Display
+	var listeners: LinkedList<>
+	var emit: LinkedList<>
 	
-	public init(display:Display) {
-		
-		self.display = display
-		
-	}
-	
-	deinit() {
-		
-		display.mutex.unbalancedLock()
-		
-		release()
-		
-		display.mutex.unbalancedUnlock()
-
-		
-	}
-	
-	func release() {
-		
-		
-		
-		
-	}
 	
 }

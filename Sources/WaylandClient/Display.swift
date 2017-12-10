@@ -12,6 +12,8 @@
 
 public class Display {
 
+	static var debugClient: Bool = false
+
 	var proxy: Proxy
 	var connection: Connection
 	var lastError: Int
@@ -30,11 +32,8 @@ public class Display {
 	
 	
 	func wakeupThreads() {
-		
 		readSerial++
-		
-		//pthread_cond_broadcast(readerCond);
-
+		readerCond.broadcast()
 	}
 	
 	
