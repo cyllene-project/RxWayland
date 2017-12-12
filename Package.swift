@@ -22,10 +22,19 @@ let package = Package(
             name: "WaylandServer",
             dependencies: ["Networking", "Util", "Signals"]),
         .target(
+            name: "WaylandClient",
+            dependencies: ["Networking", "Util", "Signals"]),
+        .target(
             name: "Util",
             dependencies: []),
+        .target(
+            name: "Private",
+            dependencies: ["Util"]),
         .testTarget(
-            name: "WaylandTests",
+            name: "ClientTests",
+            dependencies: ["WaylandClient"]),
+        .testTarget(
+            name: "ServerTests",
             dependencies: ["WaylandServer"]),
     ]
 )

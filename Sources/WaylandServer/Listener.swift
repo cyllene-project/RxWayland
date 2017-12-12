@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// ProxyFlag.swift
+// Listener.swift
 // 
 // This source file is part of the Cyllene open source project
 // https://github.com/cyllene-project
@@ -13,11 +13,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-struct ProxyFlag : OptionSet {
-	
-    let rawValue: Int
+typealias NotifyFunc = (Listener, Any?) -> Void
 
-    static let idDeleted = KeyboardLocks(rawValue: 1 << 0)
-    static let destroyed = KeyboardLocks(rawValue: 1 << 1)
-    static let wrapper	 = KeyboardLocks(rawValue: 1 << 2)
+class Listener {
+	var notify: NotifyFunc?
 }

@@ -1,6 +1,8 @@
 import XCTest
-@testable import WaylandTests
+@testable import ClientTests
+@testable import ServerTests
 
 XCTMain([
-    testCase(WaylandTests.allTests),
+    testCase(ClientTests.allTests),
+    testCase(ServerTests.allTests),
 ])

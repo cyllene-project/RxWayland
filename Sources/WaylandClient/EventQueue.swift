@@ -10,6 +10,9 @@
 //
 //===----------------------------------------------------------------------===//
 
+import Util
+import Private
+
 public class EventQueue {
 	
 	var eventList = LinkedList<Closure>()
@@ -21,7 +24,7 @@ public class EventQueue {
 		
 	}
 	
-	deinit() {
+	deinit {
 		
 		display.mutex.unbalancedLock()
 		

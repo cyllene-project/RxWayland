@@ -32,7 +32,7 @@ public struct EventLoop {
 
 	public func addSignal(signal:Signal, cb: @escaping SignalFunction, data: Any) throws -> EventSource? {
 		
-		var source = EventSourceSignal(signal:signal)
+		let source = EventSourceSignal(signal:signal)
 		
 		var mask = try SignalSet(fill:false)
 		
@@ -66,7 +66,7 @@ public struct EventLoop {
 			types = PollEvent.Types.out
 		}
 
-		var ep = PollEvent(types, data: .fd(source.fd.fileDescriptor))
+		let ep = PollEvent(types, data: .fd(source.fd.fileDescriptor))
 		
 		try self.epollFd.add(fd:source.fd, event:ep)
 		

@@ -10,13 +10,13 @@
 // you may not use this file except in compliance with the License.
 // 
 // See http://www.apache.org/licenses/LICENSE-2.0 for license information
-
+//
 //===----------------------------------------------------------------------===//
 
-public class Map {
-	var clientEntries: []
-	var serverEntries: []
-	var side: UInt32
-	var freeList: UInt32
+public struct Map {
+	//var clientEntries: []
+	//var serverEntries: []
+	var side: UInt32 = 0
+	var freeList: UInt32 = 0
 	
 }

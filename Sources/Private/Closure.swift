@@ -10,7 +10,7 @@
 // you may not use this file except in compliance with the License.
 // 
 // See http://www.apache.org/licenses/LICENSE-2.0 for license information
-
+//
 //===----------------------------------------------------------------------===//
 
 public class Closure {
@@ -21,14 +21,17 @@ public class Closure {
 	var senderId: UInt32
 	var args: [Argument]
 	var proxy: Proxy
-	var extra: []
+	//var extra: []
 	
+	init() {
+		
+	}
 
 	public struct InvokeFlag : OptionSet {
 	    let rawValue: Int
 
-		static let client = KeyboardLocks(rawValue: 1 << 0)
-		static let server = KeyboardLocks(rawValue: 1 << 1)
+		static let client = InvokeFlag(rawValue: 1 << 0)
+		static let server = InvokeFlag(rawValue: 1 << 1)
 	}
 	
 }

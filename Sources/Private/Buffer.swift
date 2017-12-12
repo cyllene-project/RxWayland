@@ -1,4 +1,4 @@
-struct Buffer {
+public struct Buffer {
 
 	var data: [CChar] = []
 	var head, tail: UInt32

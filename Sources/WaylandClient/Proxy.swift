@@ -23,7 +23,7 @@ public class Proxy {
 
 
 
-	public create(interface:Interface, version:UInt32) -> Proxy {
+	public func create(interface:Interface, version:UInt32) -> Proxy {
 		
 		display.mutex.unbalancedLock()
 		

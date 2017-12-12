@@ -85,8 +85,6 @@ public class Display {
 		mutex.unbalancedUnlock()
 	}
 	
-	
-	
 }
 
 

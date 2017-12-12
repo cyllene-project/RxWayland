@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// ProxyFlag.swift
+// ClientTests.swift
 // 
 // This source file is part of the Cyllene open source project
 // https://github.com/cyllene-project
@@ -13,11 +13,30 @@
 //
 //===----------------------------------------------------------------------===//
 
-struct ProxyFlag : OptionSet {
-	
-    let rawValue: Int
+import XCTest
+@testable import WaylandClient
 
-    static let idDeleted = KeyboardLocks(rawValue: 1 << 0)
-    static let destroyed = KeyboardLocks(rawValue: 1 << 1)
-    static let wrapper	 = KeyboardLocks(rawValue: 1 << 2)
+class ClientTests: XCTestCase {
+
+    func testDestroyListener() {
+
+		var rawDescriptors: [Int32] = [0, 0]
+
+		XCTAssertEqual(socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, &rawDescriptors), 0)
+
+		var display = Display()
+
+		XCTAssertNotNil(display)
+		
+		var client = Client(display, rawDescriptors[0])
+		
+		XCTAssertNotNil(client)
+		
+
+    }
+
+
+    static var allTests = [
+        ("testDestroyListener", testDestroyListener),
+    ]
 }
