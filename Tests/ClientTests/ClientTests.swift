@@ -18,25 +18,33 @@ import XCTest
 
 class ClientTests: XCTestCase {
 
-    func testDestroyListener() {
+    func testNewClient() {
 
-		var rawDescriptors: [Int32] = [0, 0]
-
-		XCTAssertEqual(socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, &rawDescriptors), 0)
-
-		var display = Display()
-
+		let display = Display()
+		
 		XCTAssertNotNil(display)
-		
-		var client = Client(display, rawDescriptors[0])
-		
-		XCTAssertNotNil(client)
-		
+
+		display.disconnect()
 
     }
+    
+    func testGetRegistry() {
+		
+		let display = Display()
+		
+		var registry = display.getRegistry()
+		
+		
+			
+
+
+		display.disconnect()
+		
+	}
 
 
     static var allTests = [
-        ("testDestroyListener", testDestroyListener),
+        ("testNewClient", testNewClient),
+        ("testGetRegistry", testGetRegistry),
     ]
 }

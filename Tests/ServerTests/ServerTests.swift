@@ -3,13 +3,25 @@ import XCTest
 
 class ServerTests: XCTestCase {
 
-    func testExample() {
+    func testDestroyListener() {
 
-        XCTAssertEqual(Wayland().text, "Hello, World!")
+		var rawDescriptors: [Int32] = [0, 0]
+
+		XCTAssertEqual(socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, &rawDescriptors), 0)
+
+		var display = Display()
+
+		XCTAssertNotNil(display)
+		
+		var client = Client(display, rawDescriptors[0])
+		
+		XCTAssertNotNil(client)
+		
+
     }
 
 
     static var allTests = [
-        ("testExample", testExample),
+        ("testDestroyListener", testDestroyListener),
     ]
 }
