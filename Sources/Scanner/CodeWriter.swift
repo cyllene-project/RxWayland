@@ -13,6 +13,24 @@
 class CodeWriter {
 
 
+	func writeFile(context:CodeContext, fileName: String) throws {
+
+		
+		let fileManager = FileManager.default()
+		
+		if fileManager.fileExistsAtPath(fileName) {
+			throw 
+		}
+		
+
+		if let outputStream = OutputStream(path: fileName) {
+
+			try outputStream.write(to: fileURL, atomically: false, encoding: .utf8)
+
+		}
+	}
+
+
 	func visit_interface (interface: Interface) {
 		
 	}
