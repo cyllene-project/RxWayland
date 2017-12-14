@@ -17,7 +17,7 @@ struct ProxyFlag : OptionSet {
 	
     let rawValue: Int
 
-    static let idDeleted = KeyboardLocks(rawValue: 1 << 0)
-    static let destroyed = KeyboardLocks(rawValue: 1 << 1)
-    static let wrapper	 = KeyboardLocks(rawValue: 1 << 2)
+    static let idDeleted = ProxyFlag(rawValue: 1 << 0)
+    static let destroyed = ProxyFlag(rawValue: 1 << 1)
+    static let wrapper	 = ProxyFlag(rawValue: 1 << 2)
 }

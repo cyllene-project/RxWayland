@@ -9,40 +9,60 @@
 // See http://www.apache.org/licenses/LICENSE-2.0 for license information
 //
 //===----------------------------------------------------------------------===//
+#if os(Linux)
+import Glibc
+#else
+import Darwin
+#endif
+
+import Foundation
+import Util
+import Private
 
 public class Display {
 
 	static var debugClient: Bool = false
 
-	var proxy: Proxy
-	var connection: Connection
-	var lastError: Int
+	var proxy: Proxy?
+	//var connection: Connection
+	var lastError: Int32 = 0
 	
-	var protocolError: (code:DisplayError, interface:Interface, id:UInt32)
+	//var protocolError: (code:DisplayError, interface:Interface, id:UInt32)
 	
-	var fd: Int32
-	var objects: Map
-	var displayQueue: EventQueue
-	var defaultQueue: EventQueue
+	var fd: Int32 = -1
+	//var objects: Map
+	//var displayQueue: EventQueue
+	//var defaultQueue: EventQueue
 	var mutex: PThreadMutex
 
 	var readerCount: Int = 0
-	var readSerial: UInt32
+	var readSerial: UInt32 = 0
 	var readerCond: PThreadCond
+	
+	
+	public init (fd: Int32) {
+		
+		self.fd = fd
+		self.mutex = PThreadMutex()
+		self.readerCond = PThreadCond()
+		
+	}
 	
 	public static func connect(name:String?) throws -> Display {
 		
-		var fd: Int32
+		var fd: Int32?
 		
-		if let connection = getenv("WAYLAND_SOCKET") {
+		if let connection = ProcessInfo.processInfo.environment["WAYLAND_SOCKET"] {
 			
-			guard fd = Int32(connection, radix:10)
-			else throw DisplayError.invalidSocket(socket: connection)
+			guard let fd = Int32(connection, radix:10)
+			else {
+				throw DisplayError.invalidSocket(socket: connection)
+			}
 			
 			let flags = fcntl(fd, F_GETFD)
 			
 			if flags != -1 {
-				fcntl(fd, F_SETFD, flags | FD_CLOEXEC)
+				let _ = fcntl(fd, F_SETFD, flags | FD_CLOEXEC)
 			}
 			
 			unsetenv("WAYLAND_SOCKET")
@@ -52,38 +72,36 @@ public class Display {
 			try fd = connectToSocket(name: name)
 		}
 
-		return connectToFd(fd:fd)
+		return try connectToFd(fd:fd!)
 		
 	}
 	
 	public static func connectToSocket(name: String?) throws -> Int32 {
 
 		guard let runtimeDir = getenv("XDG_RUNTIME_DIR")
-		else throw DisplayError.xdgDirNotSet
+		else { throw DisplayError.xdgDirNotSet }
 		
-		let dName = name {
-			let dName =  getenv("WAYLAND_DISPLAY") {
-				dName = "wayland-0"
-			}
-		}
+		let socketName = name ?? (ProcessInfo.processInfo.environment["WAYLAND_DISPLAY"] ?? "wayland-0")
+				
+		//let fd = socketCloexec(PF_LOCAL, SOCK_STREAM, 0)
 		
-		let fd = socketCloexec(PF_LOCAL, SOCK_STREAM, 0)
+		var addr = sockaddr_un()
 		
-		let addr = sockaddr_un()
-		
-		addr.sun_family = AF_LOCAL
+		addr.sun_family = UInt16(AF_LOCAL)
 		
 		
-
+		return -1
 	}
 
 	public static func connectToFd(fd:Int32) throws -> Display {
 	
-		if let debug = getenv("WAYLAND_DEBUG") {
-			if debug == "client" || debug == "1" debugClient = true
+		if let debug = ProcessInfo.processInfo.environment["WAYLAND_DEBUG"] {
+			if debug == "client" || debug == "1" {
+				debugClient = true
+			}
 		}
 	
-		return Display(fd)
+		return Display(fd: fd)
 	} 
 	
 	public func disconnect() {
@@ -95,7 +113,7 @@ public class Display {
 	}
 	
 	func wakeupThreads() {
-		readSerial++
+		readSerial += 1
 		readerCond.broadcast()
 	}
 	
@@ -107,10 +125,10 @@ public class Display {
 		}
 		
 		if error != 0 {
-			error = EFAULT
+			//error = EFAULT
 		}
 		
-		lastError = error
+		//lastError = error
 		
 		wakeupThreads()
 	}
@@ -127,11 +145,11 @@ public class Display {
 			 //intf == DisplayInterface
 			switch code {
 				 
-				case (.invalidObject, .invalidMethod) :
+				case .invalidObject:
 					err = EINVAL
 					break
-				case .noMemory:
-					err = ENOMEM
+				case .invalidMethod:
+					err = EINVAL
 					break
 				default:
 					err = EFAULT
@@ -141,19 +159,20 @@ public class Display {
 		mutex.unbalancedLock()
 		
 		lastError = err
+		/*
 		protocolError.code = code
 		protocolError.id = id
-		protocolError.interface = intf
-		
+		protocolError.interface = intf!
+		*/
 		mutex.unbalancedUnlock()
 	}
 	
 }
 
 
-enum DisplayError {
-	case invalidObject = 0
-	case invalidMethod = 1
-	case xdgDirNotSet = 2
+enum DisplayError : Error {
+	case invalidObject
+	case invalidMethod
+	case xdgDirNotSet
 	case invalidSocket(socket: String)
 }

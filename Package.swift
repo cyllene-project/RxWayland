@@ -20,16 +20,16 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "WaylandServer",
-            dependencies: ["Networking", "Util", "Signals"]),
+            dependencies: ["Networking", "Signals", "Private", "Util"]),
         .target(
             name: "WaylandClient",
-            dependencies: ["Networking", "Util", "Signals"]),
-        .target(
-            name: "Util",
-            dependencies: []),
+            dependencies: ["Networking", "Signals", "Private", "Util"]),
         .target(
             name: "Private",
             dependencies: ["Util"]),
+        .target(
+            name: "Util",
+            dependencies: []),
         .testTarget(
             name: "ClientTests",
             dependencies: ["WaylandClient"]),

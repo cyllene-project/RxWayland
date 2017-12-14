@@ -13,14 +13,15 @@
 //
 //===----------------------------------------------------------------------===//
 
-public class Object {
+import Util
+
+public struct Object {
 	
-	var interface: Interface
-	var implementation: Any?
-	var id: Int32
+	public var interface: Interface?
+	public var implementation: Any?
+	public var id: Int32 = 0
 
-
-	init() {
+	public init() {
 		
 	}
 	

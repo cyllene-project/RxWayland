@@ -46,13 +46,6 @@ public protocol RawMutex: ScopedMutex {
 extension RawMutex {
 	/** RECOMMENDATION: until Swift can inline between modules or at least optimize @noescape closures to the stack, if this file is linked into another compilation unit (i.e. linked as part of the CwlUtils.framework but used from another module) it might be a good idea to copy and paste the relevant `fastsync` implementation code into your file (or module and delete `private` if whole module optimization is enabled) and use it instead, allowing the function to be inlined.
 ~~~
-private extension UnfairLock {
-	func fastsync<R>(execute work: @noescape () throws -> R) rethrows -> R {
-		os_unfair_lock_lock(&unsafeLock)
-		defer { os_unfair_lock_unlock(&unsafeLock) }
-		return try work()
-	}
-}
 private extension PThreadMutex {
 	func fastsync<R>(execute work: @noescape () throws -> R) rethrows -> R {
 		pthread_mutex_lock(&unsafeMutex)
@@ -121,27 +114,4 @@ public final class PThreadMutex: RawMutex {
 	}
 }
 
-/// A basic wrapper around `os_unfair_lock` (a non-FIFO, high performance lock that offers safety against priority inversion). This type is a "class" type to prevent accidental copying of the `os_unfair_lock`.
-/// NOTE: due to the behavior of the lock (non-FIFO) a single thread might drop and reacquire the lock without giving waiting threads a chance to resume (leading to potential starvation of waiters). For this reason, it is only recommended in situations where contention is expected to be rare or the interaction between contenders is otherwise known.
-@available(OSX 10.12, iOS 10, tvOS 10, *)
-public final class UnfairLock: RawMutex {
-	public typealias MutexPrimitive = os_unfair_lock
-	
-	public init() {
-	}
-	
-	/// Exposed as an "unsafe" public property so non-scoped patterns can be implemented, if required.
-	public var unsafeMutex = os_unfair_lock()
-	
-	public func unbalancedLock() {
-		os_unfair_lock_lock(&unsafeMutex)
-	}
-	
-	public func unbalancedTryLock() -> Bool {
-		return os_unfair_lock_trylock(&unsafeMutex)
-	}
-	
-	public func unbalancedUnlock() {
-		os_unfair_lock_unlock(&unsafeMutex)
-	}
-}
+

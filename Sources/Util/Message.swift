@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Closure.swift
+// Message.swift
 // 
 // This source file is part of the Cyllene open source project
 // https://github.com/cyllene-project
@@ -13,25 +13,12 @@
 //
 //===----------------------------------------------------------------------===//
 
-import Util
-
-public struct Closure {
+public struct Message {
 	
-	var count: Int
-	var message: Message
-	var opcode: UInt32
-	var senderId: UInt32
-	//var args: [Argument]
-	//var proxy: Proxy
-	//var extra: []
+	public var name: String
 	
-
-	/*
-	public struct InvokeFlag : OptionSet {
-	    let rawValue: Int
-
-		static let client = InvokeFlag(rawValue: 1 << 0)
-		static let server = InvokeFlag(rawValue: 1 << 1)
-	}*/
+	public var signature: String
+	
+	//Interface
 	
 }
