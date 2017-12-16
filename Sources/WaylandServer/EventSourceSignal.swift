@@ -9,20 +9,20 @@
 // See http://www.apache.org/licenses/LICENSE-2.0 for license information
 //
 //===----------------------------------------------------------------------===//
-
+import OS
 
 class EventSourceSignal {
 
 	var base: EventSource?
 
-	//var signal: Signal
+	var signal: Signal
 
 	var callback: SignalFunction?
 
-	//public init(signal:Signal) {
+	public init(signal:Signal) {
 		
-	//	self.signal = signal
+		self.signal = signal
 	
-	//}
+	}
 
 } 

@@ -30,7 +30,7 @@ public extension FileDescriptor {
 public enum SocketError: Error {
 	
 	case nameLength(name: String)
-	case connection(err: Int32)
+	case connection(err: String)
 }
 
 public struct Socket {
@@ -74,7 +74,7 @@ public struct Socket {
 		}
 		
 		if cRes == -1 {	
-			throw SocketError.connection(err: errno)			
+			throw SocketError.connection(err: String(cString: strerror(errno)))			
 		}
 	}
 	

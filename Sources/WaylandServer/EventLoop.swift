@@ -10,7 +10,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-//import Epoll
+import Epoll
+import OS
 
 public typealias SignalFunction = (Signal, Any) -> Int
 

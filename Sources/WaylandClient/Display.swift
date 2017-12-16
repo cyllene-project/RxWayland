@@ -55,9 +55,7 @@ public class Display {
 		if let connection = ProcessInfo.processInfo.environment["WAYLAND_SOCKET"] {
 			
 			guard let fd = Int32(connection, radix:10)
-			else {
-				throw DisplayError.invalidSocket(socket: connection)
-			}
+			else { throw DisplayError.invalidSocket(socket: connection) }
 			
 			let socket = Socket(fd: fd)
 						
@@ -66,9 +64,7 @@ public class Display {
 		} else {
 
 			guard let runtimeDir = getenv("XDG_RUNTIME_DIR")
-			else {
-				throw DisplayError.xdgDirNotSet
-			}
+			else { throw DisplayError.xdgDirNotSet }
 
 			let socketName = "\(runtimeDir)/" +
 				(name ?? (ProcessInfo.processInfo.environment["WAYLAND_DISPLAY"] ?? "wayland-0"))
