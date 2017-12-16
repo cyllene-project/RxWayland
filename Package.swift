@@ -12,18 +12,17 @@ let package = Package(
             targets: ["WaylandServer"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/cyllene-project/Networking.git", from: "0.2.1"),
-        .package(url: "https://github.com/IBM-Swift/BlueSignals.git", from: "0.9.50"),
+        //.package(url: "https://github.com/PerfectlySoft/Perfect-Net.git", from: "3.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "WaylandServer",
-            dependencies: ["Networking", "Signals", "Private", "Util"]),
+            dependencies: ["Private", "Util"]),
         .target(
             name: "WaylandClient",
-            dependencies: ["Networking", "Signals", "Private", "Util"]),
+            dependencies: ["Private", "Util"]),
         .target(
             name: "Private",
             dependencies: ["Util"]),

@@ -10,8 +10,6 @@
 //
 //===----------------------------------------------------------------------===//
 
-import OS
-
 public class EventSource {
 
 	//var interface: EventSourceProtocol

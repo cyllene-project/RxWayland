@@ -48,7 +48,7 @@ public class Display {
 		
 	}
 	
-	public static func connect(name:String?) throws -> Display {
+	public static func connect(name:String? = nil) throws -> Display {
 		
 		var fd: Int32?
 		
@@ -59,39 +59,27 @@ public class Display {
 				throw DisplayError.invalidSocket(socket: connection)
 			}
 			
-			let flags = fcntl(fd, F_GETFD)
-			
-			if flags != -1 {
-				let _ = fcntl(fd, F_SETFD, flags | FD_CLOEXEC)
-			}
-			
+			let socket = Socket(fd: fd)
+						
 			unsetenv("WAYLAND_SOCKET")
 			
 		} else {
 
-			try fd = connectToSocket(name: name)
+			guard let runtimeDir = getenv("XDG_RUNTIME_DIR")
+			else {
+				throw DisplayError.xdgDirNotSet
+			}
+
+			let socketName = "\(runtimeDir)/" +
+				(name ?? (ProcessInfo.processInfo.environment["WAYLAND_DISPLAY"] ?? "wayland-0"))
+
+			let socket = try Socket(name: socketName)
 		}
 
-		return try connectToFd(fd:fd!)
+		return try connectToFd(fd: fd!)
 		
 	}
 	
-	public static func connectToSocket(name: String?) throws -> Int32 {
-
-		guard let runtimeDir = getenv("XDG_RUNTIME_DIR")
-		else { throw DisplayError.xdgDirNotSet }
-		
-		let socketName = name ?? (ProcessInfo.processInfo.environment["WAYLAND_DISPLAY"] ?? "wayland-0")
-				
-		//let fd = socketCloexec(PF_LOCAL, SOCK_STREAM, 0)
-		
-		var addr = sockaddr_un()
-		
-		addr.sun_family = UInt16(AF_LOCAL)
-		
-		
-		return -1
-	}
 
 	public static func connectToFd(fd:Int32) throws -> Display {
 	

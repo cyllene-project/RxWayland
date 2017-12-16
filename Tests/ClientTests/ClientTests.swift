@@ -18,9 +18,9 @@ import XCTest
 
 class ClientTests: XCTestCase {
 
-    func testNewClient() {
+    func testNewClient() throws {
 
-		let display = Display()
+		let  display = try Display.connect()
 		
 		XCTAssertNotNil(display)
 
@@ -30,15 +30,11 @@ class ClientTests: XCTestCase {
     
     func testGetRegistry() {
 		
-		let display = Display()
+		//let display = Display()
 		
-		var registry = display.getRegistry()
-		
-		
-			
+		//var registry = display.getRegistry()
 
-
-		display.disconnect()
+		//display.disconnect()
 		
 	}
 

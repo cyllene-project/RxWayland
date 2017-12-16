@@ -10,14 +10,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-import Epoll
-import OS
+//import Epoll
 
 public typealias SignalFunction = (Signal, Any) -> Int
 
 public struct EventLoop {
 
-	var epollFd: Epoll
+	//var epollFd: Epoll
 	//var checkList: LinkedList<>
 	//var idleList: LinkedList<>
 	//var destroyList: LinkedList<>
@@ -26,7 +25,7 @@ public struct EventLoop {
 
 	public init () throws {
 	
-		try self.epollFd = Epoll.init(flags:.cloExec)
+		//try self.epollFd = Epoll.init(flags:.cloExec)
 		// initialise lists
 	}
 
@@ -68,7 +67,7 @@ public struct EventLoop {
 
 		let ep = PollEvent(types, data: .fd(source.fd.fileDescriptor))
 		
-		try self.epollFd.add(fd:source.fd, event:ep)
+		//try self.epollFd.add(fd:source.fd, event:ep)
 		
 		return source
 		
