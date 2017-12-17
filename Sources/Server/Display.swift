@@ -10,7 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-import Util
+import Shared
 import Foundation
 
 typealias GlobalFilterFunc = (Client, Global, Any?) -> Bool

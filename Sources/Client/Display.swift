@@ -16,8 +16,7 @@ import Darwin
 #endif
 
 import Foundation
-import Util
-import Private
+import Shared
 
 public class Display {
 
