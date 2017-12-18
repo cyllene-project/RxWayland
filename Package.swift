@@ -29,9 +29,9 @@ let package = Package(
             dependencies: []),
         .testTarget(
             name: "ClientTests",
-            dependencies: ["Client"]),
+            dependencies: ["Client", "Shared", "Networking"]),
         .testTarget(
             name: "ServerTests",
-            dependencies: ["Server"]),
+            dependencies: ["Server", "Shared", "Networking"]),
     ]
 )

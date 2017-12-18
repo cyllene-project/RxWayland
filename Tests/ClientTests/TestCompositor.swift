@@ -19,8 +19,9 @@ import Glibc
 import Darwin
 #endif
 
-import Util
+import Shared
 import Server
+import Client
 
 struct TestCompositor {
 	
@@ -36,24 +37,24 @@ class Display {
 	
 	var display: Server.Display
 	
-	var clients: LinkedList<>
+	//var clients: LinkedList<>
 	
 	var clientsNo: UInt32 = 0
 	var clientsTerminatedNo: UInt32 = 0
 	
-	var waitingForResume: LinkedList<>
+	//var waitingForResume: LinkedList<>
 	var wfrNum: UInt32 = 0
 	
 	
-	init() {
+	init() throws {
 		
-		display = Server.Display()
+		display = try Server.Display()
 		
 		let socketName = getSocketName()
 		
-		let stat = display.addSocket(name:socketName)
+		try display.addSocket(name:socketName)
 		
-		let g = Global()
+		//let g = Global()
 		
 	}
 	
@@ -63,7 +64,7 @@ class Display {
 		var time = timeval(tv_sec: 0, tv_usec: 0)
 		gettimeofday(&time, nil)
 		
-		return "wayland-test-" + String(getpid()) + "-" + String(time.tv_sec) + String(time.tv_used)
+		return "wayland-test-" + String(getpid()) + "-" + String(time.tv_sec) + String(time.tv_usec)
 		
 	}
 }

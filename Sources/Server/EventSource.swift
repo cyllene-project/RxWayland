@@ -9,7 +9,7 @@
 // See http://www.apache.org/licenses/LICENSE-2.0 for license information
 //
 //===----------------------------------------------------------------------===//
-import OS
+import Shared
 
 public class EventSource {
 
@@ -17,9 +17,9 @@ public class EventSource {
 	var loop: EventLoop?
 	//var link: LinkedList<>
 	var data: Any?
-	var fd: SignalFileDescriptor
+	var fd: FileDescriptor
 	
-	init(fd:SignalFileDescriptor) {
+	init(fd:FileDescriptor) {
 		
 		self.fd = fd
 		

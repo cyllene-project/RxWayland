@@ -1,5 +1,5 @@
 import XCTest
-@testable import WaylandServer
+@testable import Server
 
 class ServerTests: XCTestCase {
 

@@ -20,45 +20,45 @@ import Shared
 
 public class Display {
 
-	static var debugClient: Bool = false
+	var socket: Socket	
 
-	var proxy: Proxy?
+	var mutex: PThreadMutex = PThreadMutex()
+	var readerCond: PThreadCond = PThreadCond()
+	var readerCount: Int = 0
+	var readSerial: UInt32 = 0
+
+	//var proxy: Proxy?
 	//var connection: Connection
-	var lastError: Int32 = 0
-	
+	//var lastError: Int32 = 0
 	//var protocolError: (code:DisplayError, interface:Interface, id:UInt32)
 	
-	var fd: Int32 = -1
 	//var objects: Map
 	//var displayQueue: EventQueue
 	//var defaultQueue: EventQueue
-	var mutex: PThreadMutex
 
-	var readerCount: Int = 0
-	var readSerial: UInt32 = 0
-	var readerCond: PThreadCond
+	init(fd: FileDescriptor) throws {
+		socket = try Socket(fd: fd)
+	}
 	
-	
-	public init (fd: Int32) {
-		
-		self.fd = fd
-		self.mutex = PThreadMutex()
-		self.readerCond = PThreadCond()
-		
+	init(socketName: String) throws {
+		socket = try NamedSocket(name:socketName, flags:FD_CLOEXEC)
+		try (socket as! NamedSocket).connect()
 	}
 	
 	public static func connect(name:String? = nil) throws -> Display {
-		
-		var fd: Int32?
-		
+				
 		if let connection = ProcessInfo.processInfo.environment["WAYLAND_SOCKET"] {
 			
 			guard let fd = Int32(connection, radix:10)
 			else { throw DisplayError.invalidSocket(socket: connection) }
 			
-			let socket = Socket(fd: fd)
-						
+			let flags = fd.getFlags()
+			if flags != -1 {
+				fd.setFlags(flags | FD_CLOEXEC)
+			}
+			
 			unsetenv("WAYLAND_SOCKET")
+			return try Display(fd: fd)
 			
 		} else {
 
@@ -68,86 +68,23 @@ public class Display {
 			let socketName = "\(runtimeDir)/" +
 				(name ?? (ProcessInfo.processInfo.environment["WAYLAND_DISPLAY"] ?? "wayland-0"))
 
-			let socket = try Socket(name: socketName)
-		}
-
-		return try connectToFd(fd: fd!)
-		
+			return try Display(socketName: socketName)
+		}		
 	}
 	
 
-	public static func connectToFd(fd:Int32) throws -> Display {
-	
-		if let debug = ProcessInfo.processInfo.environment["WAYLAND_DEBUG"] {
-			if debug == "client" || debug == "1" {
-				debugClient = true
-			}
-		}
-	
-		return Display(fd: fd)
+	public static func connectToFd(fd:FileDescriptor) throws -> Display {
+		return try Display(fd: fd)
 	} 
 	
-	public func disconnect() {
-		
+	public func disconnect() throws {
 		//free resources
-		
-		close(self.fd)
-		
+		try socket.close()
 	}
 	
 	func wakeupThreads() {
 		readSerial += 1
 		readerCond.broadcast()
-	}
-	
-	
-	func fatalError(error:Int) {
-		
-		if lastError != 0 {
-			return
-		}
-		
-		if error != 0 {
-			//error = EFAULT
-		}
-		
-		//lastError = error
-		
-		wakeupThreads()
-	}
-	
-	func protocolError(code:DisplayError, id:UInt32, intf:Interface?) {
-
-		if lastError != 0 {
-			return
-		}
-		
-		var err = EPROTO
-		
-		if intf != nil {
-			 //intf == DisplayInterface
-			switch code {
-				 
-				case .invalidObject:
-					err = EINVAL
-					break
-				case .invalidMethod:
-					err = EINVAL
-					break
-				default:
-					err = EFAULT
-			}
-		}
-		
-		mutex.unbalancedLock()
-		
-		lastError = err
-		/*
-		protocolError.code = code
-		protocolError.id = id
-		protocolError.interface = intf!
-		*/
-		mutex.unbalancedUnlock()
 	}
 	
 }

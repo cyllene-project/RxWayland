@@ -10,7 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-enum EventType : Int {
+public enum EventType : Int {
 
 	case readable = 0x01
 	case writable = 0x02

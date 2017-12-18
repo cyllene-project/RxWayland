@@ -12,6 +12,7 @@
 
 import Epoll
 import OS
+import Shared
 
 public typealias SignalFunction = (Signal, Any) -> Int
 
@@ -29,6 +30,22 @@ public struct EventLoop {
 		//try self.epollFd = Epoll.init(flags:.cloExec)
 		// initialise lists
 	}
+	
+	
+	public func add(fd: Shared.FileDescriptor, eventType: EventType) throws -> EventSource {
+		
+		var source = try EventSource(fd: fd.duplicate())
+		
+		
+		return try add(source: source, eventType: eventType)
+		
+	}
+	
+	public func add(source: EventSource, eventType: EventType) throws -> EventSource {
+		return source
+	}
+	
+	
 
 	public func addSignal(signal:Signal, cb: @escaping SignalFunction, data: Any) throws -> EventSource? {
 		
@@ -40,7 +57,7 @@ public struct EventLoop {
 		
 		let fd:Int32 = -1
 		
-		source.base!.fd = try mask.fileDescriptor(replacing:fd.fileDescriptor, flags:[.cloExec, .nonBlock])
+		//source.base!.fd = try mask.fileDescriptor(replacing:fd.fileDescriptor, flags:[.cloExec, .nonBlock])
 		
 		try mask.block(mode:.block)
 		

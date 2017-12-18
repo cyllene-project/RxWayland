@@ -15,9 +15,16 @@
 
 #if os(Linux)
 import Glibc
+private let sock_stream = Int32(SOCK_STREAM.rawValue)
 #else
 import Darwin
+private let sock_stream = SOCK_STREAM
 #endif
+
+private let socketConnect = connect
+private let socketBind = bind
+private let socketListen = listen
+private let fileClose = close
 
 public typealias FileDescriptor = Int32
 
@@ -25,97 +32,141 @@ public extension FileDescriptor {
 	
 	public var isValid: Bool { return self >= 0 }
 	
+	public func getFlags() -> Int32 {
+		return fcntl(self, F_GETFD)
+	}
+
+	@discardableResult public func setFlags(_ flags: Int32) -> Int32 {		
+		return fcntl(self, F_SETFD, flags)
+	}
+	
+	public mutating func close() throws {
+		if fileClose(self) != 0 {
+			throw SocketError.connection(err: String(cString: strerror(errno)))
+		}
+		self = -1
+	}
+	
+	public func duplicate(minfd:Int32 = 0) throws -> FileDescriptor {
+		
+		var newFd = fcntl(self, F_DUPFD_CLOEXEC, minfd)
+		
+		if newFd.isValid {
+			return newFd
+		}
+		
+		if errno != EINVAL {
+			return -1
+		}
+		
+		newFd = fcntl(self, F_DUPFD, minfd)
+		
+		if newFd.setFlags(FD_CLOEXEC) < 0 {
+			try newFd.close()
+			return -1
+		}
+		
+		return newFd
+	}
 }
 
 public enum SocketError: Error {
 	
 	case nameLength(name: String)
 	case connection(err: String)
+	case bind(err: String)
+	case listen(err: String)
+	case invalidFileDescriptor
 }
 
-public struct Socket {
+open class Socket {
 	
-	static let pathLength = 108
-		
-	public var fd: FileDescriptor
+	public var fd: FileDescriptor = -1
+
+	public var isValid: Bool { return fd.isValid }
 	
-	public init(fd: FileDescriptor, flags: Int32 = FD_CLOEXEC) {
-		
-		self.fd = fd
-		
-		if fd.isValid {
-			setFlags(flags: flags)
-		}
-	}
+	public init() { }
 	
-	
-	public init(name: String) throws {
-	
-		if name.utf8.count > Socket.pathLength {
-			throw SocketError.nameLength(name: name)
-		}
-	
-		fd = socket(PF_LOCAL, Int32(SOCK_CLOEXEC.rawValue | SOCK_STREAM.rawValue), 0)
-		
+	public init(flags: Int32) throws {
+		self.fd = socket(AF_UNIX, sock_stream | flags, 0)
 		if fd.isValid != true {
-			fd = socket(PF_LOCAL, Int32(SOCK_STREAM.rawValue), 0)
-			setFlags(flags: FD_CLOEXEC)
+			throw SocketError.invalidFileDescriptor
 		}
-		let (addrPtr, addrLen) = self.makeAddress(from: name)
-		defer { addrPtr.deallocate(capacity: addrLen) }
-		
-		let cRes = addrPtr.withMemoryRebound(to: sockaddr.self, capacity: 1) {
-			(p:UnsafeMutablePointer<sockaddr>) -> Int32 in
-		#if os(Linux)
-			return Glibc.connect(fd, p, socklen_t(addrLen))
-		#else
-			return Darwin.connect(fd, p, socklen_t(addrLen))
-		#endif
-		}
-		
-		if cRes == -1 {	
-			throw SocketError.connection(err: String(cString: strerror(errno)))			
+	}
+
+	public init(fd: FileDescriptor) throws {
+		self.fd = fd
+	}
+
+	public func close() throws {
+		try self.fd.close()
+	}
+
+}
+
+open class NamedSocket : Socket {
+	
+	private var address: sockaddr_un
+	
+	private var addressLength: Int
+	
+	public var name: String {
+		return withUnsafePointer(to: &address.sun_path) {
+			$0.withMemoryRebound(to: UInt8.self, capacity: MemoryLayout.size(ofValue: address.sun_path)) {
+				String(cString: $0)
+			}
 		}
 	}
 	
-	func makeAddress(from: String) -> (UnsafeMutablePointer<UInt8>, Int) {
-		
-		let utf8 = from.utf8
-	#if os(Linux)	
-		let addrLen = MemoryLayout<sockaddr_un>.size
-	#else
-		let addrLen = MemoryLayout<UInt8>.size + MemoryLayout<sa_family_t>.size + utf8.count + 1
-	#endif	
-		let addrPtr = UnsafeMutablePointer<UInt8>.allocate(capacity: addrLen)
-		var memLoc = 0
-	#if os(Linux)
-		let afUnixShort = UInt16(AF_LOCAL)
-		addrPtr[memLoc] = UInt8(afUnixShort & 0xFF)
-		memLoc += 1
-		addrPtr[memLoc] = UInt8((afUnixShort >> 8) & 0xFF)
-		memLoc += 1
-	#else
-		addrPtr[memLoc] = UInt8(addrLen)
-		memLoc += 1
-		addrPtr[memLoc] = UInt8(AF_UNIX)
-		memLoc += 1
-	#endif
-		for char in utf8 {
-			addrPtr[memLoc] = char
-			memLoc += 1
+	public init(name: String, flags: Int32) throws {
+		address = sockaddr_un()
+		addressLength = name.withCString { Int(strlen($0)) }
+		super.init()
+		fd = socket(PF_LOCAL, sock_stream | flags, 0)
+		if fd.isValid != true {
+			throw SocketError.invalidFileDescriptor
 		}
-		addrPtr[memLoc] = 0
-		return (addrPtr, addrLen)
+
+		try initAddress(name: name)
+	}
+
+	func initAddress(name: String) throws {
+		address.sun_family = sa_family_t(AF_UNIX)
+				
+		guard addressLength < MemoryLayout.size(ofValue: address.sun_path)
+		else { throw SocketError.nameLength(name: name) }
+
+		_ = withUnsafeMutablePointer(to: &address.sun_path.0) { ptr in
+			name.withCString {
+				strncpy(ptr, $0, addressLength)
+			}
+		}
+		
 	}
 	
-	@discardableResult public func setFlags(flags: Int32) -> Int32 {
+	public func bind() throws {
+		try withUnsafePointer(to: &address) {
+			try $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+				guard socketBind(fd, $0, socklen_t(addressLength)) != -1
+				else { throw SocketError.bind(err: String(cString: strerror(errno))) }
+			}
+		}
 		
-		let oldFlags = fcntl(fd, F_GETFD)
-		
-		return fcntl(fd, F_SETFD, oldFlags | flags)
-		
+	} 
+	
+	public func connect() throws {
+		try withUnsafePointer(to: &address) {
+			try $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+				guard socketConnect(fd, $0, socklen_t(addressLength)) != -1
+				else { throw SocketError.connection(err: String(cString: strerror(errno))) }
+			}
+		}
 	}
 	
-	
+	public func listen(backlog: Int32) throws {
+		guard socketListen(fd, backlog) < 0
+		else { throw SocketError.listen(err: String(cString: strerror(errno))) }
+	}
+
 	
 }

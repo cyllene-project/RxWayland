@@ -19,7 +19,7 @@ public class Display {
 
 	var loop: EventLoop
 	//var run: Int
-	
+
 	var id: UInt32 = 1
 	var serial: UInt32 = 0
 	
@@ -39,18 +39,29 @@ public class Display {
 
 	var debugServer: Bool = false
 
-	init () throws {
-	
-		if let value = ProcessInfo.processInfo.environment["WAYLAND_DEBUG"] {
-			if value == "server" || value == "1" {
-				debugServer = true
-			}
-		}
+	public init () throws {
 
 		try self.loop = EventLoop()
 		
 	}
 	
-	
+	public func addSocket(name: String?) throws {
+				
+		guard let runtimeDir = getenv("XDG_RUNTIME_DIR")
+		else { throw DisplayError.xdgDirNotSet }
 
+		let socketName = name ?? (ProcessInfo.processInfo.environment["WAYLAND_DISPLAY"] ?? "wayland-0")
+				
+		let socket = try ServerSocket(path: "\(runtimeDir)/", name: socketName)
+		
+		try socket.bind()
+		try socket.listen(backlog: 128)
+
+	}
+
+}
+
+enum DisplayError : Error {
+	case xdgDirNotSet
+	case invalidSocket(socket: String)
 }

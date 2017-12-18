@@ -14,13 +14,13 @@
 //===----------------------------------------------------------------------===//
 
 import XCTest
-@testable import WaylandClient
+@testable import Client
 
 class ClientTests: XCTestCase {
 
     func testNewClient() throws {
 
-		let  display = try Display.connect()
+		let  display = try Client.Display.connect()
 		
 		XCTAssertNotNil(display)
 

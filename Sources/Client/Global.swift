@@ -10,7 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-struct Global {
+public struct Global {
 	
 	var id: UInt32
 	var interface: String
