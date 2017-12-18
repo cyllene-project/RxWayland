@@ -56,6 +56,8 @@ public class Display {
 		
 		try socket.bind()
 		try socket.listen(backlog: 128)
+		socket.source = try loop.add(fd:socket.fd, eventType: .readable) //callback
+		socketList.append(socket)
 
 	}
 

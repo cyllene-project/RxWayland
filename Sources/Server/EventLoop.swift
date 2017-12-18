@@ -10,15 +10,14 @@
 //
 //===----------------------------------------------------------------------===//
 
-import Epoll
-import OS
 import Shared
 
-public typealias SignalFunction = (Signal, Any) -> Int
+//public typealias SignalFunction = (Signal, Any) -> Int
 
 public struct EventLoop {
 
-	//var epollFd: Epoll
+	var epoll: EventPoll
+	
 	//var checkList: LinkedList<>
 	//var idleList: LinkedList<>
 	//var destroyList: LinkedList<>
@@ -27,8 +26,7 @@ public struct EventLoop {
 
 	public init () throws {
 	
-		//try self.epollFd = Epoll.init(flags:.cloExec)
-		// initialise lists
+		epoll = try EventPoll(flags:.cloExec)
 	}
 	
 	
@@ -41,7 +39,7 @@ public struct EventLoop {
 		
 	}
 	
-	public func add(source: EventSource, eventType: EventType) throws -> EventSource {
+	func add(source: EventSource, eventType: EventType) throws -> EventSource {
 		return source
 	}
 	

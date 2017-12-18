@@ -11,18 +11,32 @@
 //===----------------------------------------------------------------------===//
 import Shared
 
-public class EventSource {
+protocol EventSource {
 
-	//var interface: EventSourceProtocol
-	var loop: EventLoop?
-	//var link: LinkedList<>
-	var data: Any?
+	var loop: EventLoop
+	var data: Any
+	var fd: FileDescriptor
+
+	func dispatch(event: PollEvent) -> Int32
+	
+}
+
+class FileDescriptorSource : EventSource {
+	
+	var loop: EventLoop
+	var data: Any
 	var fd: FileDescriptor
 	
-	init(fd:FileDescriptor) {
-		
+	init(loop: EventLoop, data: Any, fd: FileDescriptor) {
+		self.loop = loop
+		self.data = data
 		self.fd = fd
-		
 	}
 
+	func dispatch(event: PollEvent) -> Int32 {
+		
+	}
+	
+	
+	
 }
