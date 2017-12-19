@@ -18,9 +18,9 @@ public struct EventLoop {
 
 	var epoll: EventPoll
 	
-	//var checkList: LinkedList<>
-	//var idleList: LinkedList<>
-	//var destroyList: LinkedList<>
+	var checkList: LinkedList<EventSource>
+	var idleList: LinkedList<EventSource>
+	var destroyList: LinkedList<EventSource>
 	
 	//var destroySignal: Signal
 
@@ -88,5 +88,23 @@ public struct EventLoop {
 		return source
 		
 	}
+	
+	public func dispatch(timeout: Int) -> Bool {
+		
+		
+		dispatchIdle()
+		
+		let count = try epoll.poll(...)
+		
+		
+		dispatchIdle()
+		
+		return true
+	}
 
+	public func dispatchIdle() {
+		
+		
+	}
+	
 }
