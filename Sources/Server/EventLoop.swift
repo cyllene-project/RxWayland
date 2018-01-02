@@ -10,32 +10,33 @@
 //
 //===----------------------------------------------------------------------===//
 
+import Dispatch
 import Shared
+import RxSwift
 
-//public typealias SignalFunction = (Signal, Any) -> Int
+public final class EventLoop : SerialDispatchQueueScheduler {
 
-public struct EventLoop {
-
-	var epoll: EventPoll
 	
-	var checkList: LinkedList<EventSource>
-	var idleList: LinkedList<EventSource>
-	var destroyList: LinkedList<EventSource>
-	
-	//var destroySignal: Signal
-
-	public init () throws {
-	
-		epoll = try EventPoll(flags:.cloExec)
-	}
-	
-	
-	public func add(fd: Shared.FileDescriptor, eventType: EventType) throws -> EventSource {
+	public func add(fd: FileDescriptor, eventType: EventType) -> Observable<UInt> {
 		
-		var source = try EventSource(fd: fd.duplicate())
+		return Observable.create { observer in
 		
+			let readSource = DispatchSource.makeReadSource(fileDescriptor: fd)
+
+			let cancel = Disposables.create {
+				readSource.cancel()
+			}
+
+			readSource.setEventHandler {
+				if cancel.isDisposed {
+					return
+				}
+				observer.on(.next(readSource.mask))
+			}
+			
+			return cancel		
 		
-		return try add(source: source, eventType: eventType)
+		}
 		
 	}
 	

@@ -45,6 +45,18 @@ public class Display {
 		
 	}
 	
+	public func getSerial() -> UInt32 {
+		return serial
+	}
+	
+	public func nextSerial() -> UInt32 {
+		serial += 1
+		return serial
+	}
+	
+	
+	
+	
 	public func addSocket(name: String?) throws {
 				
 		guard let runtimeDir = getenv("XDG_RUNTIME_DIR")

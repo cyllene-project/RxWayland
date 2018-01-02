@@ -9,6 +9,7 @@ public class Client {
 	//var connection: Connection
 	//var source: EventSource
 	var display: Display
+
 	//var displayResource: Resource
 	//var link: LinkedList<>
 	//var object: Map
@@ -18,9 +19,10 @@ public class Client {
 	//var resourceCreatedSignal: PrivateSignal
 
 
-	init (display:Display, fd:Int32) {
+	init (display:Display, fd:FileDescriptor) {
 		
 		self.display = display
+		
 		
 		//self.source = display.loop.addFd(fd:fd, type:.readable, cb: connectionData, data: self)
 		
@@ -28,5 +30,28 @@ public class Client {
 		
 		
 	}
+	
+	public func flush() {
+		
+	}
+	
+	public func getDisplay() -> Display {
+		return display
+	}
+	
+	public func getCredentials() {
+		
+	}
+	
+	public func getFd() -> FileDescriptor {
+		
+	}
+	
+	public func getObject(id: UInt32) -> Resource {
+		
+	}
+	
+	
+	
 
 }

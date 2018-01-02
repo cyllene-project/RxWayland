@@ -82,6 +82,63 @@ public class Display {
 		try socket.close()
 	}
 	
+	public func createQueue() -> EventQueue {
+		return EventQueue(display: self)
+	}
+	
+	public func getFd() -> FileDescriptor {
+		return socket.fd
+	}
+	
+	public func roundtrip(queue: EventQueue) throws -> Int {
+		
+	}
+	
+	public func roundtrip() -> Int {
+		
+	}
+	
+	public func readEvents() throws {
+		
+	}
+	
+	public func prepareRead(queue: EventQueue) throws {
+		
+	}
+	
+	public func prepareRead() throws {
+		
+	}
+	
+	public func cancelRead() {
+		
+	}
+	
+	public func dispatch(queue: EventQueue) throws {
+		
+	}
+	
+	public func dispatchPending(queue: EventQueue) throws {
+		
+	}
+
+	public func dispatchPending() throws {
+		
+	}
+	
+	public func dispatch() throws {
+		
+	}
+	
+	public func getProtocolError() -> UInt32 {
+		
+	}
+	
+	public func flush() throws {
+		
+	}
+	
+	
 	func wakeupThreads() {
 		readSerial += 1
 		readerCond.broadcast()
