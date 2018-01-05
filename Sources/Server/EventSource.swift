@@ -18,32 +18,4 @@ public protocol EventSource {
 	
 }
 
-class FileDescriptorSource : EventSource {
-	
-	let _mainQueue: DispatchQueue
-	var fd: FileDescriptor
-	var events: [EventType]
-	
-	var acceptSource: DispatchSourceRead?
-	var sendSource: DispatchSourceWrite?
-	
-	init(queue: DispatchQueue, fd: FileDescriptor, events: [EventType]) {
-		_mainQueue = queue
-		self.fd = fd
-		self.events = events
-		
-		if events.contains(.readable) {
-			acceptSource = DispatchSource.makeReadSource(fileDescriptor: fd, queue: queue)
-		}
-		
-		if events.contains(.writable) {
-			sendSource = DispatchSource.makeWriteSource(fileDescriptor: fd, queue: queue)
-		}
-		
-	}
 
-	public func dispatch() {
-		
-	}
-
-}
