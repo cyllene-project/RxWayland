@@ -24,8 +24,8 @@ class FileDescriptorSource : EventSource {
 	var fd: FileDescriptor
 	var events: [EventType]
 	
-	var acceptSource: DispatchSourceRead
-	var sendSource: DispatchSourceWrite
+	var acceptSource: DispatchSourceRead?
+	var sendSource: DispatchSourceWrite?
 	
 	init(queue: DispatchQueue, fd: FileDescriptor, events: [EventType]) {
 		_mainQueue = queue

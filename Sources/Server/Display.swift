@@ -39,9 +39,9 @@ public class Display {
 
 	var debugServer: Bool = false
 
-	public init () throws {
+	public init () {
 
-		try self.loop = EventLoop()
+		self.loop = EventLoop()
 		
 	}
 	

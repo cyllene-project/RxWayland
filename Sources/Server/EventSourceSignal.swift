@@ -17,7 +17,7 @@ class EventSourceSignal {
 
 	var signal: Signal
 
-	var callback: SignalFunction?
+	//var callback: SignalFunction?
 
 	public init(signal:Signal) {
 		

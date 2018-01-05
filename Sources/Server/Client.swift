@@ -4,9 +4,11 @@ import Glibc
 import Darwin
 #endif
 
+import Shared
+
 public class Client {
 
-	//var connection: Connection
+	var connection: Connection
 	var source: EventSource
 	var display: Display
 
@@ -28,18 +30,6 @@ public class Client {
 
 		source = display.loop.add(fd:fd, eventType: [.readable])
 		
-
-		
-		
-		
-		let sub = source
-			.subscribe(onNext: { n in
-
-				
-
-			})
-			
-		
 		
 		
 		
@@ -56,14 +46,7 @@ public class Client {
 	public func getCredentials() {
 		
 	}
-	
-	public func getFd() -> FileDescriptor {
-		
-	}
-	
-	public func getObject(id: UInt32) -> Resource {
-		
-	}
+
 	
 	
 	

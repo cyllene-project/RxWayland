@@ -12,7 +12,7 @@
 
 typealias ResourceDestroyFunc = (Resource) -> Void
 
-struct Resource {
+public struct Resource {
 
 	//var object: Object
 	
