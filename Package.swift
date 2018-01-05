@@ -20,13 +20,13 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "Server",
-            dependencies: ["Shared", "Networking"]),
+            dependencies: ["Shared", "Networking", "RxSwift"]),
         .target(
             name: "Client",
-            dependencies: ["Shared"]),
+            dependencies: ["Shared", "RxSwift"]),
         .target(
             name: "Shared",
-            dependencies: []),
+            dependencies: ["RxSwift"]),
         .testTarget(
             name: "ClientTests",
             dependencies: ["Client", "Shared", "Networking"]),

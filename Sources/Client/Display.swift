@@ -91,11 +91,11 @@ public class Display {
 	}
 	
 	public func roundtrip(queue: EventQueue) throws -> Int {
-		
+		return -1
 	}
 	
 	public func roundtrip() -> Int {
-		
+		return -1		
 	}
 	
 	public func readEvents() throws {
@@ -131,7 +131,7 @@ public class Display {
 	}
 	
 	public func getProtocolError() -> UInt32 {
-		
+		return 0
 	}
 	
 	public func flush() throws {

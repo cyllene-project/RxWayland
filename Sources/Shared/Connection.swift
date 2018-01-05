@@ -10,11 +10,58 @@
 //
 //===----------------------------------------------------------------------===//
 
-struct Connection {
+import RxSwift
+import Dispatch
 
-	var input, output: Buffer
-	var fdsIn, fdsOut: Buffer
-	var fd: Int
-	var wantFlush: Int
+public class Connection {
+
+	var `in`, out: Buffer?
+	var fdsIn, fdsOut: Buffer?
+	var fd: FileDescriptor
+	var wantFlush: Bool = false
+	var queue: DispatchQueue?
+	
+	public init(fd: FileDescriptor) {
+		
+		self.fd = fd
+		
+		
+	}
+	
+	
+	public func read() -> Observable<UInt8> {
+		
+		return Observable.create { observer in
+
+			let channel = DispatchIO(
+				type: .stream,
+				fileDescriptor: self.fd,
+				queue: self.queue!,
+				cleanupHandler: { (fd) in }
+			)
+
+			channel.setLimit(lowWater: 1)
+			
+
+			let cancel = Disposables.create {
+				channel.close(flags: .stop)
+			}
+
+			channel.read(offset: 0, length: Int.max, queue: self.queue!) { done, data, code in
+				
+				if cancel.isDisposed {
+					return
+				}
+				
+				data!.forEach() { byte in					
+					observer.on(.next(byte))
+				}
+			}
+			
+			return cancel		
+
+		}
+	}
+	
 	
 }

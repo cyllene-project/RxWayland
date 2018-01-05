@@ -10,33 +10,40 @@
 //
 //===----------------------------------------------------------------------===//
 import Shared
+import Dispatch
 
-protocol EventSource {
+public protocol EventSource {
 
-	var loop: EventLoop
-	var data: Any
-	var fd: FileDescriptor
-
-	func dispatch(event: PollEvent) -> Int32
+	func dispatch()
 	
 }
 
 class FileDescriptorSource : EventSource {
 	
-	var loop: EventLoop
-	var data: Any
+	let _mainQueue: DispatchQueue
 	var fd: FileDescriptor
+	var events: [EventType]
 	
-	init(loop: EventLoop, data: Any, fd: FileDescriptor) {
-		self.loop = loop
-		self.data = data
+	var acceptSource: DispatchSourceRead
+	var sendSource: DispatchSourceWrite
+	
+	init(queue: DispatchQueue, fd: FileDescriptor, events: [EventType]) {
+		_mainQueue = queue
 		self.fd = fd
-	}
-
-	func dispatch(event: PollEvent) -> Int32 {
+		self.events = events
+		
+		if events.contains(.readable) {
+			acceptSource = DispatchSource.makeReadSource(fileDescriptor: fd, queue: queue)
+		}
+		
+		if events.contains(.writable) {
+			sendSource = DispatchSource.makeWriteSource(fileDescriptor: fd, queue: queue)
+		}
 		
 	}
-	
-	
-	
+
+	public func dispatch() {
+		
+	}
+
 }

@@ -16,9 +16,27 @@ import RxSwift
 
 public final class EventLoop : SerialDispatchQueueScheduler {
 
+	private let _mainQueue: DispatchQueue
+
+	public init(label: String) {
+		_mainQueue = DispatchQueue(label: label)
+		super.init(serialQueue: _mainQueue)
+	}
 	
-	public func add(fd: FileDescriptor, eventType: EventType) -> Observable<UInt> {
+	public init() {
+		_mainQueue = DispatchQueue.main
+        super.init(serialQueue: _mainQueue)
+	}
+	
+	
+	public func add(fd: FileDescriptor, eventType: [EventType]) -> EventSource {
 		
+		return FileDescriptorSource(queue: _mainQueue, fileDescriptor: fd, events: eventType)
+	}
+	
+		
+	public func add(fd: FileDescriptor, eventType: [EventType]) -> Observable<UInt> {
+
 		return Observable.create { observer in
 		
 			let readSource = DispatchSource.makeReadSource(fileDescriptor: fd)
@@ -40,7 +58,7 @@ public final class EventLoop : SerialDispatchQueueScheduler {
 		
 	}
 	
-	func add(source: EventSource, eventType: EventType) throws -> EventSource {
+	func add(source: EventSource, eventType: [EventType]) -> EventSource {
 		return source
 	}
 	
@@ -92,11 +110,7 @@ public final class EventLoop : SerialDispatchQueueScheduler {
 	
 	public func dispatch(timeout: Int) -> Bool {
 		
-		
-		dispatchIdle()
-		
-		let count = try epoll.poll(...)
-		
+		dispatchIdle()		
 		
 		dispatchIdle()
 		

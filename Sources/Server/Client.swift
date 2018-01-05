@@ -7,7 +7,7 @@ import Darwin
 public class Client {
 
 	//var connection: Connection
-	//var source: EventSource
+	var source: EventSource
 	var display: Display
 
 	//var displayResource: Resource
@@ -22,9 +22,23 @@ public class Client {
 	init (display:Display, fd:FileDescriptor) {
 		
 		self.display = display
+		connection = Connection(fd: fd)
+
+
+
+		source = display.loop.add(fd:fd, eventType: [.readable])
+		
+
 		
 		
-		//self.source = display.loop.addFd(fd:fd, type:.readable, cb: connectionData, data: self)
+		
+		let sub = source
+			.subscribe(onNext: { n in
+
+				
+
+			})
+			
 		
 		
 		

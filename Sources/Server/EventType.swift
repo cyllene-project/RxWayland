@@ -10,11 +10,17 @@
 //
 //===----------------------------------------------------------------------===//
 
-public enum EventType : Int {
+public struct EventType : OptionSet {
 
-	case readable = 0x01
-	case writable = 0x02
-	case hangup = 0x04
-	case error = 0x08
+	public init(rawValue: Int) {
+		self.rawValue = rawValue
+	}
+
+    public let rawValue: Int
+
+	static let readable = EventType(rawValue: 0x01)
+	static let writable = EventType(rawValue: 0x02)
+	static let hangup = EventType(rawValue: 0x04)
+	static let error = EventType(rawValue: 0x08)
 	
 }
