@@ -31,14 +31,13 @@ public final class EventLoop : SchedulerType {
 
 	public init(label: String) {
 		_mainQueue = DispatchQueue(label: label)
-		_serialScheduler = SerialDispatchQueueScheduler(queue: _mainQueue, internalSerialQueueName: "event-loop") 
+		_serialScheduler = SerialDispatchQueueScheduler(queue: _mainQueue, internalSerialQueueName: "wayland.event-loop") 
 	}
 	
 	public init() {
 		_mainQueue = DispatchQueue.main
-		_serialScheduler = SerialDispatchQueueScheduler(queue: _mainQueue, internalSerialQueueName: "event-loop") 
+		_serialScheduler = SerialDispatchQueueScheduler(queue: _mainQueue, internalSerialQueueName: "wayland.event-loop")
 	}
-
 
 	/**
 	Schedules an action to be executed immediately.
@@ -75,7 +74,6 @@ public final class EventLoop : SchedulerType {
 	public func schedulePeriodic<StateType>(_ state: StateType, startAfter: RxTimeInterval, period: RxTimeInterval, action: @escaping (StateType) -> StateType) -> Disposable {
 		return _serialScheduler.schedulePeriodic(state, startAfter: startAfter, period: period, action: action)
 	}
-	
 		
 	public func add(fd: FileDescriptor) -> Observable<EventType> {
 
@@ -102,12 +100,29 @@ public final class EventLoop : SchedulerType {
 				}
 				observer.on(.next(EventType.writable))
 			}
-			
-			return cancel		
-		
-		}
+			return cancel
+		}.observeOn(self)
 		
 	}
-
 	
+	public func add(signal: Int32) -> Observable<Int32> {
+		
+		return Observable.create { observer in
+		
+			let sig = DispatchSource.makeSignalSource(signal: signal, queue: self._mainQueue)
+		
+			let cancel = Disposables.create {
+				sig.cancel()
+			}
+
+			sig.setEventHandler {
+				if cancel.isDisposed {
+					return
+				}
+				observer.on(.next(signal))
+			}
+			
+			return cancel
+		}.observeOn(self)
+	}
 }

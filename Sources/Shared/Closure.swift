@@ -27,6 +27,9 @@ public class Closure {
 		
 		self.message = message
 		
+	}
+	
+	public func dispatch() {
 		
 	}
 

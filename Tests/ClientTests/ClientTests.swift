@@ -24,7 +24,7 @@ class ClientTests: XCTestCase {
 		
 		XCTAssertNotNil(display)
 
-		display.disconnect()
+		try display.disconnect()
 
     }
     
