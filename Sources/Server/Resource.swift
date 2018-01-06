@@ -10,11 +10,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+import Shared
+
 typealias ResourceDestroyFunc = (Resource) -> Void
 
 public struct Resource {
 
-	//var object: Object
+	public var object: Object
 	
 	var destroy: ResourceDestroyFunc
 	

@@ -13,16 +13,22 @@
 //
 //===----------------------------------------------------------------------===//
 
-public struct Closure {
+public class Closure {
 	
-	var count: Int
+	//var count: Int
 	var message: Message
-	var opcode: UInt32
-	var senderId: UInt32
+	//var opcode: UInt32
+	//var senderId: UInt32
 	//var args: [Argument]
 	//var proxy: Proxy
 	//var extra: []
 	
+	public init(message: Message, payload: [UInt32]) {
+		
+		self.message = message
+		
+		
+	}
 
 	/*
 	public struct InvokeFlag : OptionSet {

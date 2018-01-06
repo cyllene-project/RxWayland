@@ -76,27 +76,31 @@ public final class EventLoop : SchedulerType {
 		return _serialScheduler.schedulePeriodic(state, startAfter: startAfter, period: period, action: action)
 	}
 	
-	public func add(fd: FileDescriptor, eventType: [EventType]) -> EventSource {
 		
-		return FileDescriptorSource(queue: _mainQueue, fd: fd, events: eventType)
-	}
-	
-		
-	public func add(fd: FileDescriptor, eventType: [EventType]) -> Observable<UInt> {
+	public func add(fd: FileDescriptor) -> Observable<EventType> {
 
 		return Observable.create { observer in
 		
-			let readSource = DispatchSource.makeReadSource(fileDescriptor: fd)
+			let readSource = DispatchSource.makeReadSource(fileDescriptor: fd, queue: self._mainQueue)
+			let writeSource = DispatchSource.makeWriteSource(fileDescriptor: fd, queue: self._mainQueue)
 
 			let cancel = Disposables.create {
 				readSource.cancel()
+				writeSource.cancel()
 			}
 
 			readSource.setEventHandler {
 				if cancel.isDisposed {
 					return
 				}
-				observer.on(.next(readSource.mask))
+				observer.on(.next(EventType.readable))
+			}
+			
+			writeSource.setEventHandler {
+				if cancel.isDisposed {
+					return
+				}
+				observer.on(.next(EventType.writable))
 			}
 			
 			return cancel		

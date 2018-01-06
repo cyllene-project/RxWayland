@@ -11,6 +11,7 @@
 //===----------------------------------------------------------------------===//
 import Shared
 import Dispatch
+import RxSwift
 
 public protocol EventSource {
 

@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// EventSourceFileDescriptor.swift
+// FileDescriptorEventSource.swift
 // 
 // This source file is part of the Cyllene open source project
 // https://github.com/cyllene-project
@@ -14,8 +14,9 @@
 //===----------------------------------------------------------------------===//
 
 import Dispatch
+import Shared
 
-class FileDescriptorSource : EventSource {
+class FileDescriptorEventSource : EventSource {
 	
 	let _mainQueue: DispatchQueue
 	var fd: FileDescriptor

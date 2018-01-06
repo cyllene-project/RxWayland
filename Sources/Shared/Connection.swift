@@ -15,46 +15,67 @@ import Dispatch
 
 public class Connection {
 
-	var `in`, out: Buffer?
-	var fdsIn, fdsOut: Buffer?
-	var fd: FileDescriptor
-	var wantFlush: Bool = false
-	var queue: DispatchQueue?
+	let fd: FileDescriptor
+	let queue: DispatchQueue
+	let channel: DispatchIO 
 	
-	public init(fd: FileDescriptor) {
+	public init(fd: FileDescriptor, queue: DispatchQueue = DispatchQueue.main) {
 		
 		self.fd = fd
+		self.queue = queue
 		
+		channel = DispatchIO(
+			type: .stream,
+			fileDescriptor: self.fd,
+			queue: self.queue,
+			cleanupHandler: { (fd) in }
+		)
 		
+		channel.setLimit(lowWater: 1)
 	}
 	
 	
-	public func read() -> Observable<UInt8> {
+	public func flush() {
+		
+	}
+	
+
+	
+	public func read() -> Observable<[UInt32]> {
 		
 		return Observable.create { observer in
 
-			let channel = DispatchIO(
-				type: .stream,
-				fileDescriptor: self.fd,
-				queue: self.queue!,
-				cleanupHandler: { (fd) in }
-			)
-
-			channel.setLimit(lowWater: 1)
-			
+			let size = MemoryLayout<UInt32>.stride
 
 			let cancel = Disposables.create {
-				channel.close(flags: .stop)
+				self.channel.close(flags: .stop)
 			}
 
-			channel.read(offset: 0, length: Int.max, queue: self.queue!) { done, data, code in
+			self.channel.read(offset: 0, length: Int.max, queue: self.queue) { done, data, code in
+				
+				if data == nil || data!.count < size * 2 {
+					return
+				}
 				
 				if cancel.isDisposed {
 					return
 				}
 				
-				data!.forEach() { byte in					
-					observer.on(.next(byte))
+				var count = data!.count / size
+				var index = 0
+
+				let stream = data!.withUnsafeBytes { (bytes: UnsafePointer<UInt32>) in
+					Array(UnsafeBufferPointer(start: bytes, count: count))
+				}
+
+				while count > 0 {
+					
+					let length = Int(stream[index+1] >> 16)
+					let slice = stream[index...(index + length)]
+					index += length
+					count -= length + 1
+					observer.on(.next(Array(slice)))
+
 				}
 			}
 			

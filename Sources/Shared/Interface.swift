@@ -19,9 +19,9 @@ public struct Interface {
 	
 	var version: Int
 	
-	var methodCount: Int
+	public var methodCount: Int
 	
-	var methods: Message
+	public var methods: [Message]
 	
 	var eventCount: Int
 	
