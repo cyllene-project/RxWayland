@@ -12,26 +12,29 @@
 
 import Shared
 import Foundation
+import RxSwift
 
 typealias GlobalFilterFunc = (Client, Global, Any?) -> Bool
 
 public class Display {
 
-	var loop: EventLoop
-	//var run: Int
+	static let sharedInstance = Display()
 
+	var loop: EventLoop
 	var id: UInt32 = 1
 	var serial: UInt32 = 0
 	
+	let createClient: PublishSubject<Client>
+	let destroy: PublishSubject<Display>
+	
+	var disposeBag = DisposeBag()	
+	
 	//var registryResourceList: LinkedList<>
-	var globalList = LinkedList<Global>()
-	var socketList = LinkedList<Socket> ()
-	var clientList = LinkedList<Client> ()
+	var globals = LinkedList<Global>()
+	var sockets = LinkedList<Socket> ()
+	var clients = LinkedList<Client> ()
 	var protocolLoggers = LinkedList<ProtocolLogger> ()
 	
-	//var destroySignal: PrivateSignal
-	//var createClientSignal: PrivateSignal
-
 	var additionalShmFormats: [UInt32] = []
 	
 	var globalFilter: GlobalFilterFunc?
@@ -39,10 +42,16 @@ public class Display {
 
 	var debugServer: Bool = false
 
-	public init () {
+	private init () {
 
 		self.loop = EventLoop()
 		
+		createClient = PublishSubject<Client>()
+		destroy = PublishSubject<Display>()
+	}
+	
+	public class func create() -> Display {
+		return sharedInstance
 	}
 	
 	public func getSerial() -> UInt32 {
@@ -54,10 +63,12 @@ public class Display {
 		return serial
 	}
 	
+	deinit {
+		destroy.onNext(self)
+	}
 	
 	
-	
-	public func addSocket(name: String?) throws {
+	public func addSocket(name: String? = nil) throws {
 				
 		guard let runtimeDir = getenv("XDG_RUNTIME_DIR")
 		else { throw DisplayError.xdgDirNotSet }
@@ -69,8 +80,27 @@ public class Display {
 		try socket.bind()
 		try socket.listen(backlog: 128)
 		//socket.source = try loop.add(fd:socket.fd, eventType: .readable) //callback
-		socketList.append(socket)
+		sockets.append(socket)
 
+	}
+
+	public func add(shmFormat: UInt32) -> Int {
+		additionalShmFormats += [shmFormat]
+		return additionalShmFormats.count - 1
+	}
+	
+	public func addSocket() -> String {
+		
+		let MAX_DISPLAYNO = 32
+		
+		return ""
+		
+	}
+	
+	public func flushClients() {
+		_ = clients.filter { c in
+			c.connection.flush()
+		}
 	}
 
 }

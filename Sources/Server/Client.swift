@@ -10,17 +10,16 @@ import RxSwift
 public class Client {
 
 	var connection: Connection
-	//var source: FileDescriptorEventSource
 	var display: Display
 	var disposeBag = DisposeBag()
 	
 	var objects: [UInt32: Resource] = [:]
 	
+	//var ucred: ucred?
+
+	
 	//var displayResource: Resource
-	//var link: LinkedList<>
-	//var object: Map
 	//var destroySignal: PrivateSignal
-	//var ucred: ucred
 	//var error: Int
 	//var resourceCreatedSignal: PrivateSignal
 
@@ -47,13 +46,15 @@ public class Client {
 				closure.dispatch()
 			})
 			.disposed(by:disposeBag)
+		
+		display.createClient.onNext(self)
 	}
 	
 	
 	private func demarshal(data: [UInt32]) ->  Observable<Closure> {
 		return Observable.create { observer in
 			
-			let cancel = Disposables.create { }
+			let cancel = Disposables.create()
 
 			let opcode = data[1] & 0xffff
 			
@@ -84,10 +85,6 @@ public class Client {
 	
 	public func getCredentials() {
 		
-	}
-
-	
-	
-	
+	}	
 
 }

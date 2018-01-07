@@ -22,7 +22,9 @@ public final class EventLoop : SchedulerType {
 	public typealias Time = Date
 
 	private let _mainQueue: DispatchQueue
+	private let _backgroundQueue: DispatchQueue
 	private let _serialScheduler: SerialDispatchQueueScheduler
+	private let _backgroundScheduler: ConcurrentDispatchQueueScheduler
 
 	/// - returns: Current time.
 	public var now : Date {
@@ -31,13 +33,18 @@ public final class EventLoop : SchedulerType {
 
 	public init(label: String) {
 		_mainQueue = DispatchQueue(label: label)
+		_backgroundQueue = DispatchQueue(label: "wayland.background-queue", qos: .background)
 		_serialScheduler = SerialDispatchQueueScheduler(queue: _mainQueue, internalSerialQueueName: "wayland.event-loop") 
+		_backgroundScheduler = ConcurrentDispatchQueueScheduler(queue: _mainQueue)
 	}
 	
 	public init() {
 		_mainQueue = DispatchQueue.main
+		_backgroundQueue = DispatchQueue(label: "wayland.background-queue", qos: .background)
 		_serialScheduler = SerialDispatchQueueScheduler(queue: _mainQueue, internalSerialQueueName: "wayland.event-loop")
+		_backgroundScheduler = ConcurrentDispatchQueueScheduler(queue: _mainQueue)
 	}
+
 
 	/**
 	Schedules an action to be executed immediately.
@@ -124,5 +131,16 @@ public final class EventLoop : SchedulerType {
 			
 			return cancel
 		}.observeOn(self)
+	}
+	
+	public func add(_ idle: @escaping () -> Void) -> Observable<Void> {
+		
+		return Observable.create { observer in
+		
+			observer.on(.next(idle()))
+	
+			return Disposables.create()
+		}
+		.subscribeOn(self._backgroundScheduler)
 	}
 }

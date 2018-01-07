@@ -35,8 +35,8 @@ public class Connection {
 	}
 	
 	
-	public func flush() {
-		
+	public func flush() -> Bool {
+		return true
 	}
 	
 
