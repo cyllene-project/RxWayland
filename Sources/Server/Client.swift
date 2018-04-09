@@ -87,4 +87,11 @@ public class Client {
 		
 	}	
 
+	public func initSharedMemory() -> Bool {
+		
+		
+		return true
+	}
+
+
 }

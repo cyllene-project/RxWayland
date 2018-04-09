@@ -10,19 +10,17 @@
 //
 //===----------------------------------------------------------------------===//
 
-class CodeWriter {
+public class CodeWriter {
 
-	var context: CodeContext!
+	var context: CodeContext?
 	
-	var outputStream: OutputStream!
+	var outputStream: OutputStream?
 
 	var indent: Int = 0
 	
 	var bol: Bool = true
-	
-	
 
-	func writeFile(context:CodeContext, fileName: String) throws {
+	public func writeFile(context:CodeContext, fileName: String) throws {
 
 		
 		let fileManager = FileManager.default()
@@ -66,29 +64,6 @@ class CodeWriter {
 		bol = true
 		
 	}
-
-
-	func visit_interface (interface: Interface) {
-		
-	}
-	
-	func visit_description (description: Description) {
-		
-	}
-	
-	func visit_request(request: Request) {
-		
-	}
-	
-	func visit_arg(arg: Arg) {
-		
-	}
-	
-	func visit_event(event:Event) {
-		
-	}
-	
-
 
 }
 

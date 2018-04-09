@@ -30,7 +30,7 @@ struct Global {
 		self.version = version
 		self.data = data
 		self.bind = bind
-		
+		display.globals.append(self)
 		
 	}
 
